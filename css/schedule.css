@@ -1,0 +1,238 @@
+/* =========================================================
+ * schedule.css — 시험 일정 (수험표 · 복습 계획 · 달력)
+ * ========================================================= */
+
+/* ---------- 수험표 ---------- */
+.ticket {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  background: var(--paper);
+}
+.ticket.selected { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 30%, transparent); }
+.ticket-top {
+  display: flex;
+  align-items: baseline;
+  gap: .8rem;
+  padding: .8rem 1.1rem .7rem;
+  border-bottom: 1.5px solid var(--ink);
+  border-left: 8px solid var(--c);
+  border-radius: 5px 5px 0 0;
+}
+.ticket-kind { font-family: var(--serif); font-weight: 700; font-size: .95rem; letter-spacing: .3em; }
+.ticket-subject {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 4.5rem;
+}
+.ticket-fields { margin: 0; padding: .7rem 1.1rem 1rem; flex: 1; }
+.ticket-fields > div {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: .6rem;
+  padding: .3rem 0;
+  border-bottom: 1px dotted var(--rule-strong);
+  font-size: .9rem;
+}
+.ticket-fields dt { color: var(--pencil); font-weight: 600; }
+.ticket-fields dd { margin: 0; font-family: var(--serif); }
+/* 빨간 도장 */
+.ticket-stamp {
+  position: absolute;
+  right: 14px;
+  top: 10px;
+  width: 70px;
+  height: 70px;
+  border: 2.5px solid var(--omr);
+  border-radius: 50%;
+  color: var(--omr);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  transform: rotate(-12deg);
+  background: rgba(255, 255, 255, .85);
+  box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 4px color-mix(in srgb, var(--omr) 55%, transparent);
+}
+.ticket-stamp.soon { background: var(--omr); color: #fff; box-shadow: inset 0 0 0 3px var(--omr), inset 0 0 0 4.5px rgba(255, 255, 255, .7); }
+/* 절취선 */
+.ticket-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .7rem 1.1rem;
+  border-top: 1.5px dashed var(--rule-strong);
+}
+.ticket-actions::before, .ticket-actions::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+}
+.ticket-actions::before { left: -9px; clip-path: inset(0 0 0 50%); }
+.ticket-actions::after { right: -9px; clip-path: inset(0 50% 0 0); }
+
+.ticket-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .2rem;
+  padding: 1.6rem 1.4rem;
+  border: 1.5px dashed var(--rule-strong);
+  border-radius: 6px;
+  color: var(--pencil);
+}
+.ticket-empty strong { font-family: var(--serif); font-size: 1.1rem; color: var(--ink); }
+
+/* ---------- 복습 계획 ---------- */
+#planTitle { scroll-margin-top: 90px; }
+.plan-head, .cal-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .8rem; }
+.plan-summary {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: .2rem 0 1rem;
+  font-size: .9rem;
+  color: var(--ink-soft);
+}
+.plan-days { list-style: none; padding: 0; margin: 0; border-top: 1.5px solid var(--ink); }
+.plan-day {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1rem;
+  padding: .9rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.plan-day.today { background: linear-gradient(90deg, var(--omr-soft), transparent 60%); }
+.plan-day.today .plan-date strong { color: var(--omr); }
+.plan-date { padding-left: .6rem; }
+.plan-date strong { display: block; font-family: var(--serif); font-size: 1rem; }
+.plan-date span { font-size: .8rem; color: var(--pencil); }
+.plan-tasks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .35rem; }
+.plan-task { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.plan-task label { display: flex; align-items: flex-start; gap: .6rem; cursor: pointer; margin: 0; font-size: .93rem; }
+.plan-task .form-check-input { margin-top: .2rem; flex-shrink: 0; }
+.plan-task.done label span { text-decoration: line-through; color: var(--pencil); }
+.plan-task .btn { flex-shrink: 0; padding: .15rem .55rem; }
+.plan-empty { color: var(--pencil); padding: 1.2rem 0; border-top: 1.5px solid var(--ink); }
+
+/* ---------- 달력 ---------- */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1.5px solid var(--ink);
+  border-left: 1px solid var(--rule);
+}
+.cal-weekday {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--pencil);
+  text-align: center;
+  padding: .4rem 0;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.cal-weekday.sun { color: var(--omr); }
+.cal-cell {
+  min-height: 70px;
+  padding: .3rem;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .2rem;
+  min-width: 0;
+}
+.cal-cell.blank { background: var(--desk); }
+.cal-num {
+  font-size: .82rem;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+}
+.cal-cell.today .cal-num { background: var(--ink); color: #fff; font-weight: 600; }
+.cal-cell.has-exam .cal-num { box-shadow: 0 0 0 2px var(--omr); color: var(--omr); font-weight: 700; }
+.cal-cell.today.has-exam .cal-num { color: #fff; background: var(--omr); }
+.cal-cell.has-plan .cal-num::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.cal-exam {
+  max-width: 100%;
+  border: none;
+  background: color-mix(in srgb, var(--c) 12%, white);
+  border-left: 3px solid var(--c);
+  color: var(--ink);
+  font-size: .7rem;
+  font-weight: 600;
+  padding: .1rem .3rem;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 0 3px 3px 0;
+}
+.cal-exam:hover { background: color-mix(in srgb, var(--c) 22%, white); }
+
+/* ---------- 지난 시험 ---------- */
+.past-exams { margin-top: 1.5rem; }
+.past-exams summary { cursor: pointer; color: var(--pencil); font-weight: 600; font-size: .9rem; }
+.past-exams ul { list-style: none; padding: 0; margin: .6rem 0 0; }
+.past-exams li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: .8rem;
+  padding: .4rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: .88rem;
+}
+.past-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--c); margin-right: .45rem; }
+
+/* 시험 추가 창 */
+.name-chips { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .45rem; }
+.name-chips button {
+  border: 1px solid var(--rule-strong);
+  background: var(--paper);
+  border-radius: 3px;
+  font-size: .78rem;
+  padding: .1rem .5rem;
+  color: var(--ink-soft);
+}
+.name-chips button:hover { border-color: var(--ink); color: var(--ink); }
+.scope-list { border-top: 1px solid var(--rule); max-height: 220px; overflow-y: auto; }
+.scope-item { display: flex; align-items: center; gap: .6rem; padding: .5rem 0; border-bottom: 1px solid var(--rule); margin: 0; cursor: pointer; font-size: .92rem; }
+.scope-item .form-check-input { margin: 0; flex-shrink: 0; }
+
+@media (max-width: 575.98px) {
+  .plan-day { grid-template-columns: 1fr; gap: .4rem; }
+  .cal-cell { min-height: 54px; }
+  .cal-exam { font-size: .62rem; }
+}

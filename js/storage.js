@@ -6,7 +6,8 @@
 
 const KEYS = {
   subjects: 'cn_subjects',
-  materials: 'cn_materials'
+  materials: 'cn_materials',
+  exams: 'cn_exams'
 };
 const TEXT_PREFIX = 'cn_text_';
 const INIT_KEY = 'cn_initialized';
@@ -15,6 +16,45 @@ const INIT_KEY = 'cn_initialized';
 const SUBJECT_COLORS = ['#2f5fb3', '#b0561a', '#11845b', '#7b4bb0', '#c0395a', '#00809c'];
 
 /* ---------- 날짜 ---------- */
+/* 로컬 시간 기준 'YYYY-MM-DD' */
+function dateKey(d) {
+  const x = d instanceof Date ? d : new Date(d);
+  return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
+}
+
+function todayKey() {
+  return dateKey(new Date());
+}
+
+function parseDateKey(key) {
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function addDaysKey(key, n) {
+  const d = parseDateKey(key);
+  d.setDate(d.getDate() + n);
+  return dateKey(d);
+}
+
+/* 오늘부터 key까지 남은 날 (지났으면 음수) */
+function daysUntil(key) {
+  return Math.round((parseDateKey(key) - parseDateKey(todayKey())) / 86400000);
+}
+
+function ddayLabel(key) {
+  const d = daysUntil(key);
+  if (d === 0) return 'D-Day';
+  return d > 0 ? `D-${d}` : `D+${-d}`;
+}
+
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+function formatDateKo(key) {
+  const d = parseDateKey(key);
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAYS[d.getDay()]})`;
+}
+
 function nowISO() {
   return new Date().toISOString();
 }
@@ -98,6 +138,7 @@ const Subjects = {
   remove(id) {
     Materials.all().filter(m => m.subjectId === id).forEach(m => Store.remove(TEXT_PREFIX + m.id));
     Store.save(KEYS.materials, Materials.all().filter(m => m.subjectId !== id));
+    Store.save(KEYS.exams, Exams.all().filter(x => x.subjectId !== id));
     Store.save(KEYS.subjects, this.all().filter(s => s.id !== id));
   }
 };
@@ -152,5 +193,40 @@ const Materials = {
     if (!m) return null;
     const text = this.getText(id);
     return { title: m.title, text: text.trim() ? text : m.summary };
+  }
+};
+
+/* ---------- 시험 일정 ---------- */
+const Exams = {
+  all() {
+    return Store.load(KEYS.exams);
+  },
+  get(id) {
+    return this.all().find(x => x.id === id) || null;
+  },
+  /* 날짜 순 정렬 */
+  sorted() {
+    return this.all().sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
+  },
+  upcoming() {
+    return this.sorted().filter(x => daysUntil(x.date) >= 0);
+  },
+  add(exam) {
+    const list = this.all();
+    const saved = { id: Store.uid(), createdAt: nowISO(), planDone: {}, materialIds: [], time: '', place: '', ...exam };
+    list.push(saved);
+    Store.save(KEYS.exams, list);
+    return saved;
+  },
+  update(id, patch) {
+    const list = this.all();
+    const x = list.find(e => e.id === id);
+    if (!x) return null;
+    Object.assign(x, patch);
+    Store.save(KEYS.exams, list);
+    return x;
+  },
+  remove(id) {
+    Store.save(KEYS.exams, this.all().filter(x => x.id !== id));
   }
 };

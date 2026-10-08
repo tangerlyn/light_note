@@ -64,7 +64,8 @@ function showAIError(e) {
 
 /* ---------- 네비게이션 ---------- */
 const NAV_ITEMS = [
-  { href: 'index.html', label: '내 과목', pages: ['home', 'material', 'quiz'] }
+  { href: 'index.html', label: '내 과목', pages: ['home', 'material', 'quiz'] },
+  { href: 'schedule.html', label: '시험 일정', pages: ['schedule'] }
 ];
 
 function renderNav() {

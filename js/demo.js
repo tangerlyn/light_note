@@ -117,4 +117,12 @@ function seedDemoIfFirstRun() {
   }, DEMO_TEXT);
   if (!material) return;
 
+  /* 시험 일정 예시: 12일 뒤 중간고사 */
+  Exams.add({
+    subjectId: web.id,
+    name: '중간고사',
+    date: addDaysKey(todayKey(), 12),
+    time: '14:00',
+    place: '정보과학관 21304'
+  });
 }
