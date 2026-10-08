@@ -14,7 +14,7 @@
 
 ### 숭실대학교 AI소프트웨어학부 웹프로그래밍 팀
 
-| <img src="https://github.com/tangerlyn.png" width="150"> | <img src="https://github.com/고다원아이디.png" width="150"> | <img src="https://github.com/고승민아이디.png" width="150"> | <img src="https://github.com/김도형아이디.png" width="150"> |
+| <img src="https://github.com/tangerlyn.png" width="150"> | <img src="https://github.com/kodawon12.png" width="150"> | <img src="https://github.com/devrhtmdals04.png" width="150"> | <img src="https://github.com/kimdohyeong0204.png" width="150"> |
 | :---: | :---: | :---: | :---: |
 | [팀장] [김규린](https://github.com/tangerlyn) <br/> 네비게이션 / 푸터 / 내 과목 / 저장 구조 | [고다원](https://github.com/kodawon12) <br/> 자료 올리기 / 텍스트 추출 / 요약 노트 | [고승민](https://github.com/devrhtmdals04) <br/> 퀴즈 만들기 / 퀴즈 풀기 | [김도형](https://github.com/kimdohyeong0204) <br/> 시험 일정 / 복습 계획 / 달력 |
 
