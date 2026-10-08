@@ -1,0 +1,230 @@
+/* =========================================================
+ * quiz.css — 퀴즈 만들기 · 풀기 (시험지 + OMR 답안지)
+ * ========================================================= */
+
+.min-w-0 { min-width: 0; }
+
+/* ---------- 문항 (시험지) ---------- */
+.q-card {
+  padding: 1.6rem 0 1.7rem;
+  border-bottom: 1px solid var(--rule);
+}
+.q-card:last-child { border-bottom: none; }
+.q-head { display: flex; align-items: baseline; gap: .6rem; margin-bottom: .5rem; }
+.q-num {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.25rem;
+  min-width: 1.8rem;
+  position: relative;
+}
+.q-num::after { content: '.'; }
+.q-topic { font-size: .8rem; color: var(--pencil); }
+.q-text {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  line-height: 1.75;
+  margin: 0 0 1rem 2.4rem;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+/* 보기: ①②③④ 동그라미 번호. 고르면 OMR처럼 까맣게 칠해진다 */
+.choices { display: flex; flex-direction: column; gap: .15rem; margin-left: 2.4rem; }
+.choice {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .45rem .5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--serif);
+  font-size: 1.02rem;
+}
+.choice input { position: absolute; opacity: 0; pointer-events: none; }
+.choice-key {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: .78rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .12s, color .12s;
+}
+.choice-text { flex: 0 1 auto; }
+label.choice:hover { background: var(--desk); }
+label.choice:has(input:checked) .choice-key { background: var(--ink); color: #fff; }
+label.choice:has(input:focus-visible) { outline: 2px solid var(--omr); outline-offset: 1px; }
+
+.type-badge {
+  display: inline-block;
+  font-size: .74rem;
+  font-weight: 600;
+  padding: .05rem .45rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  color: var(--ink-soft);
+  background: var(--paper);
+}
+
+/* ---------- 1. 설정 ---------- */
+.setup-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .8rem; }
+.material-checks { border-top: 1.5px solid var(--ink); max-height: 460px; overflow-y: auto; }
+.material-check {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  padding: .9rem .2rem;
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+  margin: 0;
+}
+.material-check .form-check-input { width: 1.15rem; height: 1.15rem; margin: 0; flex-shrink: 0; }
+.material-check strong { font-family: var(--serif); font-size: 1.05rem; }
+.material-check:has(input:checked) strong { text-decoration: underline; text-decoration-color: var(--omr); text-decoration-thickness: 2px; text-underline-offset: 5px; }
+
+.count-rows { border-top: 1.5px solid var(--ink); }
+.count-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .8rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.count-label { font-family: var(--serif); font-size: 1.05rem; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--rule-strong); border-radius: var(--radius); }
+.stepper button { border: none; background: none; width: 34px; height: 34px; color: var(--ink); }
+.stepper button:hover { background: var(--desk); }
+.stepper span {
+  min-width: 38px;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.total-line { text-align: right; margin-top: .8rem; color: var(--pencil); }
+.total-line strong { font-family: var(--serif); font-size: 1.4rem; color: var(--ink); margin: 0 .15rem; }
+
+/* ---------- 2. 생성 중 ---------- */
+.loading-sheet { max-width: 520px; margin: 3rem auto; text-align: center; }
+.loading-sheet h2 { font-size: 1.5rem; font-weight: 700; margin: 1.6rem 0 .4rem; }
+.loading-line { height: 2px; background: var(--rule); overflow: hidden; position: relative; }
+.loading-line span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 35%;
+  background: var(--ink);
+  animation: writing 1.6s ease-in-out infinite;
+}
+@keyframes writing {
+  0% { left: -35%; }
+  100% { left: 100%; }
+}
+
+/* ---------- 3. 시험지 ---------- */
+.exam-head {
+  text-align: center;
+  padding: .4rem 0 1.2rem;
+  margin-bottom: .5rem;
+  border-bottom: 3px double var(--ink);
+}
+.exam-kicker { font-size: .88rem; color: var(--pencil); margin: 0 0 .2rem; }
+.exam-title { font-size: 1.7rem; font-weight: 700; margin: 0; word-break: keep-all; }
+.exam-paper .q-card.answered .q-num { color: var(--ink); }
+.choices.tf { flex-direction: row; gap: 1.5rem; }
+.choices.tf .choice-key { font-size: .8rem; }
+.short-input {
+  margin-left: 2.4rem;
+  width: calc(100% - 2.4rem);
+  font-family: var(--serif);
+  font-size: 1rem;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  background-image: repeating-linear-gradient(transparent, transparent 31px, var(--rule) 31px, var(--rule) 32px);
+  line-height: 32px;
+  min-height: 96px;
+}
+.short-input:focus { box-shadow: none; border-bottom-color: var(--ink); background-color: transparent; }
+
+/* ---------- OMR 답안지 ---------- */
+.omr-wrap { position: sticky; top: 84px; }
+.omr {
+  border: 1.5px solid var(--omr);
+  background: var(--paper);
+  color: var(--omr);
+  max-height: calc(100vh - 230px);
+  overflow-y: auto;
+}
+.omr-head {
+  display: flex;
+  justify-content: space-between;
+  padding: .55rem .8rem;
+  background: var(--omr-soft);
+  border-bottom: 1.5px solid var(--omr);
+  font-weight: 700;
+  font-size: .88rem;
+}
+.omr-row {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  border-bottom: 1px solid var(--omr-line);
+}
+.omr-row:nth-child(5n) { border-bottom: 1.5px solid var(--omr); }
+.omr-row:last-child { border-bottom: none; }
+.omr-no {
+  border: none;
+  border-right: 1.5px solid var(--omr);
+  background: var(--omr-soft);
+  color: var(--omr);
+  font-weight: 700;
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+.omr-row.done .omr-no { color: var(--ink); }
+.omr-cells { display: flex; align-items: center; gap: .55rem; padding: .45rem .8rem; }
+.omr-bubble {
+  width: 18px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.2px solid var(--omr);
+  background: var(--paper);
+  color: var(--omr);
+  font-size: .68rem;
+  font-weight: 600;
+  padding: 0;
+  line-height: 1;
+  transition: background .1s;
+}
+.omr-bubble:hover { background: var(--omr-soft); }
+.omr-bubble.filled { background: var(--ink); border-color: var(--ink); color: var(--ink); }
+.omr-write {
+  border: 1.2px dashed var(--omr-line);
+  background: none;
+  color: var(--omr);
+  font-size: .76rem;
+  padding: .2rem .7rem;
+  border-radius: 3px;
+}
+.omr-write.filled { border-style: solid; border-color: var(--ink); color: var(--ink); }
+.omr-progress { display: flex; align-items: center; gap: .7rem; margin: .8rem 0; font-size: .82rem; color: var(--pencil); }
+.omr-progress .progress { flex: 1; }
+
+@media (max-width: 991.98px) {
+  .omr-wrap { position: static; }
+  .omr { max-height: none; }
+}
+@media (max-width: 767.98px) {
+  .exam-title { font-size: 1.35rem; }
+}
+@media (max-width: 575.98px) {
+  .q-text, .choices { margin-left: 0; }
+  .short-input { margin-left: 0; width: 100%; }
+}
