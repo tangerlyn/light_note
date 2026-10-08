@@ -1,0 +1,5 @@
+# API 키가 들어 있는 파일은 올리지 않는다
+js/config.js
+
+# macOS
+.DS_Store

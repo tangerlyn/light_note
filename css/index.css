@@ -1,0 +1,180 @@
+/* =========================================================
+ * index.css — 내 과목 (과목 = 서류 폴더)
+ * ========================================================= */
+
+/* ---------- 과목 폴더 ---------- */
+.folder {
+  position: relative;
+  height: 100%;
+  min-height: 240px;
+  padding-top: 22px;
+}
+/* 뒤판: 과목 색. 왼쪽 위로 탭이 솟아 있다 */
+.folder-back {
+  position: absolute;
+  inset: 22px 0 0 0;
+  background: color-mix(in srgb, var(--c) 78%, black);
+  border-radius: 0 8px 8px 8px;
+}
+.folder-tab {
+  position: absolute;
+  left: 0;
+  top: -22px;
+  width: 42%;
+  height: 24px;
+  background: color-mix(in srgb, var(--c) 78%, black);
+  border-radius: 7px 7px 0 0;
+}
+.folder-tab::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  bottom: 0;
+  width: 24px;
+  height: 14px;
+  background: inherit;
+  transform: skewX(40deg);
+  border-top-right-radius: 5px;
+}
+/* 앞판과 뒤판 사이로 비치는 종이 (자료 수만큼) */
+.folder-sheets { position: absolute; inset: 22px 0 0 0; pointer-events: none; }
+.sheet {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  height: 60px;
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+}
+.sheet-1 { top: 10px; }
+.sheet-2 { top: 6px; left: 22px; right: 10px; transform: rotate(1.2deg); }
+.sheet-3 { top: 3px; left: 10px; right: 24px; transform: rotate(-1.5deg); }
+/* 앞판: 살짝 더 밝은 같은 색, 내용이 적힌 면 */
+.folder-front {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 26px);
+  margin-top: 26px;
+  padding: 1.1rem 1.2rem 1rem;
+  background: var(--c);
+  color: #fff;
+  border-radius: 6px 6px 8px 8px;
+  text-decoration: none;
+  transition: transform .18s ease;
+}
+.folder:hover .folder-front { transform: translateY(4px); }
+.folder-name {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 2rem .9rem 0;
+  word-break: keep-all;
+}
+.folder-stats { display: flex; gap: 1.4rem; margin: 0 0 auto; }
+.folder-stats dt { font-size: .76rem; font-weight: 500; opacity: .8; }
+.folder-stats dd { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; margin: 0; line-height: 1.2; }
+.folder-last {
+  font-size: .82rem;
+  margin: 1rem 0 0;
+  padding-top: .6rem;
+  border-top: 1px solid rgba(255, 255, 255, .35);
+  opacity: .9;
+}
+.folder-last { display: flex; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
+.folder-last b { font-weight: 600; }
+.folder-actions { display: flex; gap: .4rem; margin-top: .8rem; }
+.folder-actions a {
+  flex: 1;
+  text-align: center;
+  font-size: .8rem;
+  font-weight: 600;
+  padding: .35rem 0;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, .95);
+  color: var(--ink);
+  text-decoration: none;
+}
+.folder-actions a:hover { background: #fff; color: var(--ink); text-decoration: underline; }
+.folder-menu { position: absolute; right: 6px; top: 54px; }
+.folder-menu .btn-icon { color: rgba(255, 255, 255, .85); }
+.folder-menu .btn-icon:hover { background: rgba(255, 255, 255, .18); color: #fff; }
+
+/* 새 과목: 점선으로 그린 빈 폴더 */
+.folder-add {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  border: none;
+  background: none;
+  padding: 22px 0 0;
+  color: var(--pencil);
+  font-weight: 600;
+}
+.folder-add-tab {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 42%;
+  height: 24px;
+  border: 1.5px dashed var(--rule-strong);
+  border-bottom: none;
+  border-radius: 7px 7px 0 0;
+}
+.folder-add-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  height: 100%;
+  border: 1.5px dashed var(--rule-strong);
+  border-radius: 0 8px 8px 8px;
+}
+.folder-add:hover { color: var(--ink); }
+.folder-add:hover .folder-add-tab, .folder-add:hover .folder-add-body { border-color: var(--ink); background: var(--desk); }
+
+/* ---------- 최근 목록 ---------- */
+.recent-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--ink); }
+.recent-list li.recent-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.recent-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-list small { color: var(--pencil); white-space: nowrap; }
+.empty-line { color: var(--pencil); font-size: .9rem; padding: .8rem 0; border-bottom: 1px solid var(--rule); }
+.file-chip {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  text-align: center;
+  padding: .1rem 0;
+}
+
+/* ---------- 색 선택 ---------- */
+.color-picker { display: flex; gap: .6rem; }
+.color-swatch { cursor: pointer; }
+.color-swatch input { position: absolute; opacity: 0; pointer-events: none; }
+.color-swatch span {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  background: var(--c);
+  border: 2px solid var(--paper);
+  box-shadow: 0 0 0 1px var(--rule-strong);
+}
+.color-swatch input:checked + span { box-shadow: 0 0 0 2px var(--ink); }
+.color-swatch input:focus-visible + span { outline: 2px solid var(--omr); outline-offset: 3px; }
+
+@media (max-width: 767.98px) {
+  .recent-list li.recent-row { grid-template-columns: 46px minmax(0, 1fr) auto; }
+  .recent-list li.recent-row small:first-of-type { display: none; }
+}
