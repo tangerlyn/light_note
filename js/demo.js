@@ -1,6 +1,6 @@
 /* =========================================================
  * demo.js — 처음 방문했을 때 넣는 예시 데이터
- * 처음 열었을 때 화면이 비어 있지 않도록 과목 2개와 자료 1개를 넣는다.
+ * 키를 등록하지 않아도 화면 구성을 둘러볼 수 있도록 한다.
  * ========================================================= */
 
 const DEMO_TEXT = `[슬라이드 1]
@@ -97,6 +97,39 @@ CSS 박스 모델의 네 영역과 box-sizing, margin 상쇄, display 속성, �
 | 교차축 (cross axis) | 주축과 수직인 축 |
 | flex-basis | 늘거나 줄기 전의 기본 크기 |`;
 
+const DEMO_QUESTIONS = [
+  {
+    id: 'demo-q1', type: 'mc', topic: 'box-sizing',
+    question: 'width: 200px; padding: 20px; border: 5px;인 요소의 box-sizing이 content-box일 때 실제 너비는?',
+    choices: ['200px', '225px', '250px', '240px'], answer_index: 2, answer_bool: false,
+    model_answer: '250px', explanation: 'content-box는 width에 padding(20×2)과 border(5×2)가 더해져 200 + 40 + 10 = 250px이다.'
+  },
+  {
+    id: 'demo-q2', type: 'mc', topic: 'Flexbox 정렬',
+    question: 'flex-direction이 row일 때 아이템들을 세로 방향 가운데로 정렬하는 속성은?',
+    choices: ['justify-content: center', 'align-items: center', 'flex-wrap: wrap', 'text-align: center'], answer_index: 1, answer_bool: false,
+    model_answer: 'align-items: center', explanation: 'row에서 교차축은 세로이고, 교차축 정렬은 align-items가 담당한다.'
+  },
+  {
+    id: 'demo-q3', type: 'mc', topic: 'display',
+    question: 'width와 height 지정이 무시되는 display 값은?',
+    choices: ['block', 'inline-block', 'inline', 'flex'], answer_index: 2, answer_bool: false,
+    model_answer: 'inline', explanation: 'inline 요소는 내용만큼만 차지하고 width/height가 적용되지 않는다.'
+  },
+  {
+    id: 'demo-q4', type: 'tf', topic: 'margin 상쇄',
+    question: '세로로 인접한 두 블록 요소의 margin-bottom 30px과 margin-top 20px은 합쳐져 50px 간격이 된다.',
+    choices: [], answer_index: -1, answer_bool: false,
+    model_answer: 'X', explanation: 'margin 상쇄로 큰 값인 30px만 적용된다.'
+  },
+  {
+    id: 'demo-q5', type: 'short', topic: 'flex 축약형',
+    question: 'flex: 1이 어떤 세 속성의 축약형인지 각각의 값과 함께 쓰시오.',
+    choices: [], answer_index: -1, answer_bool: false,
+    model_answer: 'flex-grow: 1, flex-shrink: 1, flex-basis: 0%', explanation: 'flex: 1은 남는 공간을 1의 비율로 나눠 갖고, 줄어들 수 있으며, 기본 크기는 0%라는 뜻이다.'
+  }
+];
+
 function seedDemoIfFirstRun() {
   try {
     if (localStorage.getItem(INIT_KEY)) return;
@@ -117,7 +150,27 @@ function seedDemoIfFirstRun() {
   }, DEMO_TEXT);
   if (!material) return;
 
-  /* 시험 일정 예시: 12일 뒤 중간고사 */
+  const answers = [2, 0, 2, true, 'flex-grow 1, flex-shrink 1'];
+  const results = [
+    { correct: true, feedback: '' },
+    { correct: false, feedback: '' },
+    { correct: true, feedback: '' },
+    { correct: false, feedback: '' },
+    { correct: false, feedback: 'grow와 shrink는 맞았지만 flex-basis: 0%가 빠졌어요.' }
+  ];
+  const attempt = Attempts.add({
+    subjectId: web.id,
+    materialIds: [material.id],
+    title: material.title,
+    difficulty: 'normal',
+    mode: 'new',
+    questions: DEMO_QUESTIONS,
+    answers,
+    results,
+    score: 2,
+    total: 5
+  });
+
   Exams.add({
     subjectId: web.id,
     name: '중간고사',
@@ -125,4 +178,17 @@ function seedDemoIfFirstRun() {
     time: '14:00',
     place: '정보과학관 21304'
   });
+
+  Wrongs.addMany(DEMO_QUESTIONS
+    .map((q, i) => ({ q, i }))
+    .filter(({ i }) => !results[i].correct)
+    .map(({ q, i }) => ({
+      subjectId: web.id,
+      materialId: material.id,
+      materialTitle: material.title,
+      attemptId: attempt.id,
+      question: q,
+      myAnswer: answers[i],
+      feedback: results[i].feedback
+    })));
 }

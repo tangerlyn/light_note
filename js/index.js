@@ -1,6 +1,5 @@
 /* =========================================================
  * index.js — 내 과목 (과목 폴더 목록)
- * 과목 추가·수정·삭제와 최근 올린 자료
  * ========================================================= */
 
 let subjectModal;
@@ -22,8 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderHome() {
   const subjects = Subjects.all();
   const materials = Materials.all();
+  const attempts = Attempts.all();
+  const wrongs = Wrongs.all();
 
-  $('subjectGrid').innerHTML = subjects.map(s => folderCard(s, materials)).join('') + `
+  $('subjectGrid').innerHTML = subjects.map(s => folderCard(s, materials, attempts, wrongs)).join('') + `
     <div class="col-sm-6 col-lg-4 col-xl-3">
       <button type="button" class="folder-add" data-act="new">
         <span class="folder-add-tab" aria-hidden="true"></span>
@@ -31,31 +32,35 @@ function renderHome() {
       </button>
     </div>`;
 
-  renderRecent(materials, subjects);
+  renderRecent(materials, attempts, subjects);
+  refreshNavStatus();
 }
 
 /* 과목 = 서류 폴더. 뒤판의 탭에 과목 색, 앞판과 뒤판 사이로 자료 수만큼(최대 3장) 종이가 비친다 */
-function folderCard(s, materials) {
-  const list = materials.filter(x => x.subjectId === s.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  const sheets = Array.from({ length: Math.min(list.length, 3) }, (_, k) => `<span class="sheet sheet-${k + 1}"></span>`).join('');
+function folderCard(s, materials, attempts, wrongs) {
+  const m = materials.filter(x => x.subjectId === s.id).length;
+  const a = attempts.filter(x => x.subjectId === s.id).sort((x, y) => y.createdAt.localeCompare(x.createdAt));
+  const w = wrongs.filter(x => x.subjectId === s.id && !x.resolved).length;
+  const last = a[0];
+  const exam = Exams.nextFor(s.id);
+  const sheets = Array.from({ length: Math.min(m, 3) }, (_, k) => `<span class="sheet sheet-${k + 1}"></span>`).join('');
   return `
     <div class="col-sm-6 col-lg-4 col-xl-3">
       <article class="folder" style="--c:${s.color}" data-id="${s.id}">
         <div class="folder-back" aria-hidden="true"><span class="folder-tab"></span></div>
         <div class="folder-sheets" aria-hidden="true">${sheets}</div>
-        <div class="folder-front">
+        <a href="subject.html?id=${s.id}" class="folder-front">
           <h3 class="folder-name">${esc(s.name)}</h3>
           <dl class="folder-stats">
-            <div><dt>자료</dt><dd>${list.length}</dd></div>
+            <div><dt>자료</dt><dd>${m}</dd></div>
+            <div><dt>퀴즈</dt><dd>${a.length}</dd></div>
+            <div class="${w ? 'has-wrong' : ''}"><dt>오답</dt><dd>${w}</dd></div>
           </dl>
           <p class="folder-last">
-            <span>${list.length ? `최근 자료 <b>${formatDate(list[0].createdAt)}</b>` : '아직 올린 자료가 없어요'}</span>
+            <span>${last ? `최근 퀴즈 <b>${Math.round((last.score / last.total) * 100)}점</b>` : '아직 푼 퀴즈가 없어요'}</span>
+            ${exam ? `<span class="folder-dday">${esc(exam.name)} <b>${ddayLabel(exam.date)}</b></span>` : ''}
           </p>
-          <div class="folder-actions">
-            <a href="material.html?subject=${s.id}">자료 올리기</a>
-            <a href="quiz.html?subject=${s.id}">퀴즈 만들기</a>
-          </div>
-        </div>
+        </a>
         <div class="dropdown folder-menu">
           <button type="button" class="btn btn-icon" data-bs-toggle="dropdown" aria-expanded="false" aria-label="${esc(s.name)} 메뉴">
             <i class="bi bi-three-dots-vertical"></i>
@@ -69,18 +74,36 @@ function folderCard(s, materials) {
     </div>`;
 }
 
-function renderRecent(materials, subjects) {
+function renderRecent(materials, attempts, subjects) {
   const nameOf = id => (subjects.find(s => s.id === id) || {}).name || '';
-  const recent = [...materials].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5);
-  $('recentMaterials').innerHTML = recent.length
-    ? recent.map(m => `
-      <li class="recent-row">
-        <span class="file-chip">${fileTypeLabel(m.fileType)}</span>
-        <span class="recent-title">${esc(m.title)}</span>
-        <small>${esc(nameOf(m.subjectId))}</small>
-        <small>${formatDate(m.createdAt)}</small>
+  const recentM = [...materials].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5);
+  $('recentMaterials').innerHTML = recentM.length
+    ? recentM.map(m => `
+      <li>
+        <a href="material.html?id=${m.id}">
+          <span class="file-chip">${fileTypeLabel(m.fileType)}</span>
+          <span class="recent-title">${esc(m.title)}</span>
+          <small>${esc(nameOf(m.subjectId))}</small>
+          <small>${formatDate(m.createdAt)}</small>
+        </a>
       </li>`).join('')
     : '<li class="empty-line">아직 올린 자료가 없어요.</li>';
+
+  const recentA = [...attempts].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5);
+  $('recentAttempts').innerHTML = recentA.length
+    ? recentA.map(a => {
+        const pct = Math.round((a.score / a.total) * 100);
+        return `
+        <li>
+          <a href="quiz.html?attempt=${a.id}">
+            <span class="score-chip">${pct}점</span>
+            <span class="recent-title">${a.mode === 'retry' ? '오답 재도전' : esc(a.title)}</span>
+            <small>${esc(nameOf(a.subjectId))}</small>
+            <small>${formatDate(a.createdAt)}</small>
+          </a>
+        </li>`;
+      }).join('')
+    : '<li class="empty-line">아직 푼 퀴즈가 없어요.</li>';
 }
 
 /* ---------- 과목 추가/수정/삭제 ---------- */
@@ -129,7 +152,7 @@ function onGridClick(e) {
   if (btn.dataset.act === 'edit') openSubjectModal(subject);
   if (btn.dataset.act === 'delete') {
     const n = Materials.bySubject(id).length;
-    if (!confirm(`'${subject.name}' 과목을 삭제할까요?\n안에 있는 자료 ${n}개도 함께 삭제돼요.`)) return;
+    if (!confirm(`'${subject.name}' 과목을 삭제할까요?\n자료 ${n}개와 퀴즈 기록, 오답노트도 함께 삭제돼요.`)) return;
     Subjects.remove(id);
     toast(`<strong>${esc(subject.name)}</strong> 과목을 삭제했어요.`, 'info');
     renderHome();

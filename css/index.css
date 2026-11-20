@@ -1,12 +1,12 @@
 /* =========================================================
- * index.css — 내 과목 (과목 = 서류 폴더)
+ * index.css — 내 과목 (바인더 인덱스 탭처럼 과목을 한 줄씩)
  * ========================================================= */
 
 /* ---------- 과목 폴더 ---------- */
 .folder {
   position: relative;
   height: 100%;
-  min-height: 240px;
+  min-height: 210px;
   padding-top: 22px;
 }
 /* 뒤판: 과목 색. 왼쪽 위로 탭이 솟아 있다 */
@@ -64,7 +64,7 @@
   text-decoration: none;
   transition: transform .18s ease;
 }
-.folder:hover .folder-front { transform: translateY(4px); }
+.folder-front:hover { color: #fff; transform: translateY(4px); }
 .folder-name {
   font-family: var(--serif);
   font-size: 1.35rem;
@@ -75,6 +75,7 @@
 .folder-stats { display: flex; gap: 1.4rem; margin: 0 0 auto; }
 .folder-stats dt { font-size: .76rem; font-weight: 500; opacity: .8; }
 .folder-stats dd { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; margin: 0; line-height: 1.2; }
+.folder-stats .has-wrong dd { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .folder-last {
   font-size: .82rem;
   margin: 1rem 0 0;
@@ -84,19 +85,8 @@
 }
 .folder-last { display: flex; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
 .folder-last b { font-weight: 600; }
-.folder-actions { display: flex; gap: .4rem; margin-top: .8rem; }
-.folder-actions a {
-  flex: 1;
-  text-align: center;
-  font-size: .8rem;
-  font-weight: 600;
-  padding: .35rem 0;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, .95);
-  color: var(--ink);
-  text-decoration: none;
-}
-.folder-actions a:hover { background: #fff; color: var(--ink); text-decoration: underline; }
+.folder-dday { background: rgba(255, 255, 255, .95); color: var(--ink); border-radius: 3px; padding: 0 .4rem; font-size: .78rem; }
+.folder-dday b { color: var(--omr); }
 .folder-menu { position: absolute; right: 6px; top: 54px; }
 .folder-menu .btn-icon { color: rgba(255, 255, 255, .85); }
 .folder-menu .btn-icon:hover { background: rgba(255, 255, 255, .18); color: #fff; }
@@ -106,7 +96,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 240px;
+  min-height: 210px;
   border: none;
   background: none;
   padding: 22px 0 0;
@@ -137,14 +127,17 @@
 
 /* ---------- 최근 목록 ---------- */
 .recent-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--ink); }
-.recent-list li.recent-row {
+.recent-list li a {
   display: grid;
   grid-template-columns: 52px minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 1rem;
   padding: .75rem 0;
   border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+  color: var(--ink);
 }
+.recent-list li a:hover .recent-title { text-decoration: underline; }
 .recent-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .recent-list small { color: var(--pencil); white-space: nowrap; }
 .empty-line { color: var(--pencil); font-size: .9rem; padding: .8rem 0; border-bottom: 1px solid var(--rule); }
@@ -156,6 +149,12 @@
   border-radius: 3px;
   text-align: center;
   padding: .1rem 0;
+}
+.score-chip {
+  font-family: var(--sans);
+  font-weight: 600;
+  color: var(--omr);
+  text-align: left;
 }
 
 /* ---------- 색 선택 ---------- */
@@ -175,6 +174,6 @@
 .color-swatch input:focus-visible + span { outline: 2px solid var(--omr); outline-offset: 3px; }
 
 @media (max-width: 767.98px) {
-  .recent-list li.recent-row { grid-template-columns: 46px minmax(0, 1fr) auto; }
-  .recent-list li.recent-row small:first-of-type { display: none; }
+  .recent-list li a { grid-template-columns: 46px minmax(0, 1fr) auto; }
+  .recent-list li a small:first-of-type { display: none; }
 }

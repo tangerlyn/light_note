@@ -1,12 +1,14 @@
 /* =========================================================
  * storage.js — 벼락노트 데이터 모듈
- * 과목(폴더)과 강의자료를 localStorage에 저장한다.
+ * 과목(폴더), 자료, 퀴즈 기록, 오답노트를 localStorage에 저장한다.
  * 자료 원문은 용량이 커서 자료마다 별도 키(cn_text_<id>)에 둔다.
  * ========================================================= */
 
 const KEYS = {
   subjects: 'cn_subjects',
   materials: 'cn_materials',
+  attempts: 'cn_attempts',
+  wrongs: 'cn_wrongs',
   exams: 'cn_exams'
 };
 const TEXT_PREFIX = 'cn_text_';
@@ -14,6 +16,12 @@ const INIT_KEY = 'cn_initialized';
 
 /* 색각 이상이 있어도 서로 구분되는 6색. 흰 글씨 대비 4.5:1 이상 */
 const SUBJECT_COLORS = ['#2f5fb3', '#b0561a', '#11845b', '#7b4bb0', '#c0395a', '#00809c'];
+/* 예전 팔레트로 만든 과목은 같은 자리의 새 색으로 바꿔 준다 */
+const OLD_SUBJECT_COLORS = [
+  ['#2f5bd3', '#0f8a6a', '#c2410c', '#9333ea', '#be123c', '#475569'],
+  ['#3b5bab', '#2f7d62', '#c46a2b', '#7a4fa3', '#b33a55', '#5b6472'],
+  ['#3b5bab', '#2f7d62', '#a8571f', '#7a4fa3', '#b33a55', '#5b6472']
+];
 
 /* ---------- 날짜 ---------- */
 /* 로컬 시간 기준 'YYYY-MM-DD' */
@@ -64,6 +72,11 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
 
+function formatDateTime(iso) {
+  const d = new Date(iso);
+  return `${formatDate(iso)} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
 /* ---------- 저장소 기본 ---------- */
 let uidCounter = 0;
 
@@ -97,6 +110,18 @@ const Store = {
   uid() {
     uidCounter += 1;
     return Date.now().toString(36) + uidCounter.toString(36) + Math.random().toString(36).slice(2, 6);
+  },
+
+  /* 벼락노트가 쓰는 용량 (대략, KB) */
+  usageKB() {
+    let total = 0;
+    try {
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const k = localStorage.key(i);
+        if (k.startsWith('cn_')) total += (localStorage.getItem(k) || '').length * 2;
+      }
+    } catch (e) { /* 무시 */ }
+    return Math.round(total / 1024);
   }
 };
 
@@ -109,9 +134,18 @@ const Settings = {
 
 /* ---------- 과목 ---------- */
 const Subjects = {
-  /* 모든 화면에서 과목은 가나다순 (숫자는 크기 순: 자료구조2 → 자료구조10) */
   all() {
-    return Store.load(KEYS.subjects).sort((a, b) => a.name.localeCompare(b.name, 'ko', { numeric: true }));
+    const list = Store.load(KEYS.subjects);
+    let changed = false;
+    list.forEach(s => {
+      for (const old of OLD_SUBJECT_COLORS) {
+        const i = old.indexOf(s.color);
+        if (i >= 0) { s.color = SUBJECT_COLORS[i]; changed = true; break; }
+      }
+    });
+    if (changed) Store.save(KEYS.subjects, list);
+    /* 모든 화면에서 과목은 가나다순 (숫자는 크기 순: 자료구조2 → 자료구조10) */
+    return list.sort((a, b) => a.name.localeCompare(b.name, 'ko', { numeric: true }));
   },
   get(id) {
     return this.all().find(s => s.id === id) || null;
@@ -134,10 +168,12 @@ const Subjects = {
   touch(id) {
     this.update(id, {});
   },
-  /* 과목을 지우면 안의 자료도 함께 지운다 */
+  /* 과목을 지우면 안의 자료·퀴즈 기록·오답도 함께 지운다 */
   remove(id) {
     Materials.all().filter(m => m.subjectId === id).forEach(m => Store.remove(TEXT_PREFIX + m.id));
     Store.save(KEYS.materials, Materials.all().filter(m => m.subjectId !== id));
+    Store.save(KEYS.attempts, Attempts.all().filter(a => a.subjectId !== id));
+    Store.save(KEYS.wrongs, Wrongs.all().filter(w => w.subjectId !== id));
     Store.save(KEYS.exams, Exams.all().filter(x => x.subjectId !== id));
     Store.save(KEYS.subjects, this.all().filter(s => s.id !== id));
   }
@@ -168,8 +204,10 @@ const Materials = {
       fileName: meta.fileName || '',
       fileType: meta.fileType || 'text',
       pages: meta.pages || 0,
+      duration: meta.duration || 0,
       charCount: text.length,
       summary: meta.summary || '',
+      summaryFromPdf: !!meta.summaryFromPdf,
       createdAt: nowISO(),
       updatedAt: nowISO()
     };
@@ -183,6 +221,13 @@ const Materials = {
     Subjects.touch(material.subjectId);
     return material;
   },
+  update(id, patch) {
+    const list = this.all();
+    const m = list.find(x => x.id === id);
+    if (!m) return null;
+    Object.assign(m, patch, { updatedAt: nowISO() });
+    return Store.save(KEYS.materials, list) ? m : null;
+  },
   remove(id) {
     Store.remove(TEXT_PREFIX + id);
     Store.save(KEYS.materials, this.all().filter(m => m.id !== id));
@@ -193,6 +238,68 @@ const Materials = {
     if (!m) return null;
     const text = this.getText(id);
     return { title: m.title, text: text.trim() ? text : m.summary };
+  }
+};
+
+/* ---------- 퀴즈 기록 ---------- */
+const Attempts = {
+  all() {
+    return Store.load(KEYS.attempts);
+  },
+  bySubject(subjectId) {
+    return this.all()
+      .filter(a => a.subjectId === subjectId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  },
+  get(id) {
+    return this.all().find(a => a.id === id) || null;
+  },
+  add(attempt) {
+    const list = this.all();
+    const saved = { id: Store.uid(), createdAt: nowISO(), ...attempt };
+    list.push(saved);
+    Store.save(KEYS.attempts, list);
+    Subjects.touch(saved.subjectId);
+    return saved;
+  },
+  remove(id) {
+    Store.save(KEYS.attempts, this.all().filter(a => a.id !== id));
+  }
+};
+
+/* ---------- 오답노트 ---------- */
+const Wrongs = {
+  all() {
+    return Store.load(KEYS.wrongs);
+  },
+  get(id) {
+    return this.all().find(w => w.id === id) || null;
+  },
+  addMany(items) {
+    const list = this.all();
+    items.forEach(item => {
+      list.push({
+        id: Store.uid(),
+        createdAt: nowISO(),
+        lastWrongAt: nowISO(),
+        resolved: false,
+        wrongCount: 1,
+        memo: '',
+        ...item
+      });
+    });
+    Store.save(KEYS.wrongs, list);
+  },
+  update(id, patch) {
+    const list = this.all();
+    const w = list.find(x => x.id === id);
+    if (!w) return null;
+    Object.assign(w, patch);
+    Store.save(KEYS.wrongs, list);
+    return w;
+  },
+  remove(id) {
+    Store.save(KEYS.wrongs, this.all().filter(w => w.id !== id));
   }
 };
 
@@ -210,6 +317,10 @@ const Exams = {
   },
   upcoming() {
     return this.sorted().filter(x => daysUntil(x.date) >= 0);
+  },
+  /* 과목의 가장 가까운 시험 */
+  nextFor(subjectId) {
+    return this.upcoming().find(x => x.subjectId === subjectId) || null;
   },
   add(exam) {
     const list = this.all();
@@ -230,3 +341,26 @@ const Exams = {
     Store.save(KEYS.exams, this.all().filter(x => x.id !== id));
   }
 };
+
+/* ---------- 문항 공통 ---------- */
+const QUESTION_TYPES = {
+  mc: '객관식',
+  tf: 'OX',
+  short: '주관식'
+};
+
+const CHOICE_MARKS = ['①', '②', '③', '④'];
+
+/* 문항의 정답을 사람이 읽을 수 있는 문자열로 */
+function correctAnswerText(q) {
+  if (q.type === 'mc') return `${CHOICE_MARKS[q.answer_index]} ${q.choices[q.answer_index]}`;
+  if (q.type === 'tf') return q.answer_bool ? 'O (맞다)' : 'X (틀리다)';
+  return q.model_answer;
+}
+
+function userAnswerText(q, answer) {
+  if (answer === null || answer === undefined || answer === '') return '(답하지 않음)';
+  if (q.type === 'mc') return `${CHOICE_MARKS[answer]} ${q.choices[answer]}`;
+  if (q.type === 'tf') return answer ? 'O (맞다)' : 'X (틀리다)';
+  return answer;
+}

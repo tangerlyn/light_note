@@ -30,9 +30,15 @@
       <div class="row g-4 folder-grid" id="subjectGrid"></div>
     </section>
 
-    <section aria-labelledby="recentTitle">
-      <h2 class="section-title" id="recentTitle">최근 올린 자료</h2>
-      <ul class="recent-list" id="recentMaterials"></ul>
+    <section class="row g-5">
+      <div class="col-lg-6">
+        <h2 class="section-title">최근 올린 자료</h2>
+        <ul class="recent-list" id="recentMaterials"></ul>
+      </div>
+      <div class="col-lg-6">
+        <h2 class="section-title">최근 푼 퀴즈</h2>
+        <ul class="recent-list" id="recentAttempts"></ul>
+      </div>
     </section>
   </main>
 
@@ -63,7 +69,10 @@
   <footer id="cn-footer"></footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/ai.js"></script>
   <script src="js/demo.js"></script>
   <script src="js/common.js"></script>
   <script src="js/index.js"></script>
