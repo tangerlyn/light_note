@@ -1,0 +1,132 @@
+/* =========================================================
+ * stats.css — 학습 기록
+ * 차트 규격: 얇은 막대(≤24px)·끝만 4px 둥글게, 선 2px, 점 지름 8px + 흰 테두리 2px,
+ * 격자선은 실선 1px, 글자는 데이터 색이 아닌 글자색.
+ * 히트맵/막대 색은 한 가지 색조의 4단계 (색각 이상 시뮬레이션으로 구분 확인).
+ * ========================================================= */
+
+:root {
+  --heat-0: #e8e9e4;
+  --heat-1: #8fa3d6;
+  --heat-2: #5f7cc0;
+  --heat-3: #38539f;
+  --heat-4: #1d2f66;
+  --mark: var(--heat-3);
+}
+
+/* ---------- 필터 (아래 전부에 적용) ---------- */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8rem 1.5rem;
+  padding-bottom: 1.2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1.5px solid var(--ink);
+}
+.filter-item { display: flex; align-items: center; gap: .5rem; margin: 0; font-size: .88rem; font-weight: 600; color: var(--ink-soft); }
+.filter-item .form-select { width: auto; min-width: 130px; }
+
+.stats-section { margin-bottom: 3rem; }
+.section-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .8rem; }
+.section-note { font-size: .85rem; color: var(--pencil); margin: .3rem 0 1rem; }
+.empty-note { color: var(--pencil); font-size: .9rem; padding: .8rem 0; border-top: 1px solid var(--rule); }
+
+/* ---------- 히트맵 ---------- */
+.heatmap-wrap { overflow-x: auto; padding-bottom: .4rem; position: relative; }
+.heatmap { display: inline-block; }
+.hm-months {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell, 14px));
+  column-gap: 3px;
+  margin-left: 26px;
+  height: 18px;
+  font-size: .72rem;
+  color: var(--pencil);
+}
+.hm-months span { white-space: nowrap; }
+.hm-body { display: flex; gap: 6px; }
+.hm-days { display: grid; grid-template-rows: repeat(7, var(--cell, 14px)); row-gap: 3px; width: 20px; font-size: .68rem; color: var(--pencil); align-items: center; }
+.hm-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, var(--cell, 14px));
+  grid-template-columns: repeat(var(--cols), var(--cell, 14px));
+  gap: 3px;
+}
+.hm-grid .hm-cell { width: var(--cell, 14px); height: var(--cell, 14px); }
+.hm-cell { display: inline-block; width: 14px; height: 14px; border-radius: 3px; background: var(--heat-0); }
+.hm-cell.l1 { background: var(--heat-1); }
+.hm-cell.l2 { background: var(--heat-2); }
+.hm-cell.l3 { background: var(--heat-3); }
+.hm-cell.l4 { background: var(--heat-4); }
+.hm-cell.future { background: #f3f4f0; }
+.hm-cell.out { background: transparent; }
+.hm-cell.today { box-shadow: 0 0 0 1.5px var(--paper), 0 0 0 3px var(--ink); }
+.hm-grid .hm-cell.hover, .hm-grid .hm-cell:focus-visible { outline: 2px solid var(--omr); outline-offset: 1px; }
+.hm-legend { display: flex; align-items: center; gap: 3px; font-size: .76rem; color: var(--pencil); }
+.hm-legend .legend-text { margin: 0 .3rem; }
+.hm-legend .legend-gap { width: .8rem; }
+
+.table-view { margin-top: 1rem; }
+.table-view summary { cursor: pointer; font-size: .85rem; color: var(--pencil); font-weight: 600; }
+.stats-table { margin-top: .6rem; font-size: .88rem; max-width: 520px; --bs-table-bg: transparent; }
+.stats-table th { color: var(--pencil); font-weight: 600; border-bottom: 1.5px solid var(--ink); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---------- 과목별 점수 표 ---------- */
+.sm-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px 64px 64px 64px;
+  align-items: center;
+  gap: 1rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: .92rem;
+}
+.sm-headrow { font-size: .78rem; color: var(--pencil); font-weight: 600; border-bottom: 1.5px solid var(--ink); padding: .4rem 0; }
+.sm-name { display: flex; align-items: center; gap: .5rem; font-family: var(--serif); font-weight: 700; min-width: 0; }
+.sm-key { width: 4px; height: 1.1rem; flex-shrink: 0; border-radius: 1px; }
+
+/* ---------- 가로 막대 ---------- */
+.hbar-row {
+  display: grid;
+  grid-template-columns: minmax(70px, 120px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .8rem;
+  padding: .55rem 0;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+  color: var(--ink);
+  font-size: .9rem;
+}
+.hbar-row:first-child { border-top: 1.5px solid var(--ink); }
+.hbar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbar-track { position: relative; height: 14px; border-left: 1px solid var(--rule-strong); }
+.hbar { display: block; height: 100%; background: var(--mark); border-radius: 0 4px 4px 0; transition: background .12s; }
+.hbar-row.hover .hbar, .hbar-row:focus-visible .hbar { background: var(--heat-4); }
+.hbar-value { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hbar-value small { color: var(--pencil); margin-left: .25rem; }
+
+/* ---------- 툴팁 ---------- */
+.chart-tip {
+  position: absolute;
+  z-index: 1050;
+  pointer-events: none;
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: .45rem .65rem;
+  font-size: .8rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+  max-width: 260px;
+}
+.tip-title { color: rgba(255, 255, 255, .7); margin-bottom: .15rem; }
+.tip-row { display: flex; align-items: center; gap: .45rem; }
+.tip-row strong { font-weight: 700; }
+.tip-row span:empty { display: none; }
+.tip-row span:last-child { color: rgba(255, 255, 255, .8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tip-key { width: 12px; height: 2px; border-radius: 1px; flex-shrink: 0; }
+
+@media (max-width: 575.98px) {
+  .sm-row { grid-template-columns: minmax(0, 1fr) 48px 52px 52px 52px; gap: .5rem; font-size: .85rem; }
+}

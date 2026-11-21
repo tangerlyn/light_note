@@ -146,7 +146,7 @@ function renderPlanSelect(upcoming) {
 
 /*
  * 남은 날(최대 14일)에 "요약 노트 읽기 → 퀴즈 풀기"를 자료마다 고르게 나누고,
- * 시험 전날에는 전체 범위 퀴즈를 둔다. 할 일의 키는 날짜와 무관해서
+ * 시험 전날에는 오답 다시 풀기를 둔다. 할 일의 키는 날짜와 무관해서
  * 날짜가 바뀌어 계획이 다시 짜여도 완료 표시가 유지된다.
  */
 function buildPlan(exam) {
@@ -168,12 +168,16 @@ function buildPlan(exam) {
   const perDay = Math.max(1, Math.ceil(tasks.length / slots));
   const plan = days.map(date => ({ date, tasks: [] }));
   tasks.forEach((t, i) => plan[Math.min(Math.floor(i / perDay), slots - 1)].tasks.push(t));
-  plan[plan.length - 1].tasks.push({ key: 'all', type: 'all' });
+  plan[plan.length - 1].tasks.push({ key: 'wrong', type: 'wrong' });
   return plan.filter(d => d.tasks.length);
 }
 
 function isTaskDone(exam, task) {
-  return !!(exam.planDone && exam.planDone[task.key]);
+  if (exam.planDone && exam.planDone[task.key]) return true;
+  if (task.type === 'quiz') {
+    return Attempts.all().some(a => (a.materialIds || []).includes(task.material.id) && a.createdAt >= exam.createdAt);
+  }
+  return false;
 }
 
 function taskHTML(exam, task) {
@@ -182,13 +186,13 @@ function taskHTML(exam, task) {
   let link;
   if (task.type === 'read') {
     text = `요약 노트 읽기: ${esc(task.material.title)}`;
-    link = '';
+    link = `<a href="material.html?id=${task.material.id}" class="btn btn-sm btn-light">열기</a>`;
   } else if (task.type === 'quiz') {
     text = `퀴즈 풀기: ${esc(task.material.title)}`;
     link = `<a href="quiz.html?material=${task.material.id}" class="btn btn-sm btn-light">풀기</a>`;
   } else {
-    text = '전체 범위 퀴즈 풀기';
-    link = `<a href="quiz.html?subject=${exam.subjectId}" class="btn btn-sm btn-light">풀기</a>`;
+    text = '오답 다시 풀기';
+    link = `<a href="quiz.html?retry=1&subject=${exam.subjectId}" class="btn btn-sm btn-light">풀기</a>`;
   }
   return `
     <li class="plan-task ${done ? 'done' : ''}">

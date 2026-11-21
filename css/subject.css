@@ -1,0 +1,78 @@
+/* =========================================================
+ * subject.css — 과목 폴더 상세
+ * ========================================================= */
+
+.tab-count { font-weight: 500; color: var(--pencil); margin-left: .2rem; }
+
+/* ---------- 자료 목록 ---------- */
+.material-list { list-style: none; padding: 0; margin: 0; }
+.material-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.file-chip {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  text-align: center;
+  padding: .12rem 0;
+}
+.material-main { min-width: 0; text-decoration: none; color: var(--ink); }
+.material-main strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: .2rem;
+}
+.material-main:hover strong { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.material-oneline {
+  display: block;
+  font-size: .88rem;
+  color: var(--pencil);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.material-info { display: flex; gap: 1rem; font-size: .82rem; color: var(--pencil); white-space: nowrap; }
+.material-info span:empty { display: none; }
+.material-actions { display: flex; align-items: center; gap: .2rem; }
+
+.upload-empty {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  padding: 2.5rem 1.5rem;
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--pencil);
+}
+.upload-empty strong { font-family: var(--serif); color: var(--ink); font-size: 1.15rem; }
+.upload-empty:hover { border-color: var(--ink); color: var(--pencil); background: var(--desk); }
+
+/* ---------- 퀴즈 기록 표 ---------- */
+.attempt-table { font-size: .92rem; --bs-table-bg: transparent; }
+.attempt-table th {
+  font-size: .8rem;
+  color: var(--pencil);
+  font-weight: 600;
+  border-bottom: 1.5px solid var(--ink);
+  padding: .6rem .8rem .6rem 0;
+}
+.attempt-table td { padding: .8rem .8rem .8rem 0; border-color: var(--rule); }
+.scope-cell { max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.score-pen { font-family: var(--sans); font-size: .95rem; font-weight: 600; line-height: 1; color: var(--omr); }
+.score-pen small { font-size: inherit; }
+
+@media (max-width: 767.98px) {
+  .material-row { grid-template-columns: 44px minmax(0, 1fr) auto; gap: .8rem; }
+  .material-info { display: none; }
+  .scope-cell { max-width: 140px; }
+}

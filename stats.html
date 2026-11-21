@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>벼락노트 · 학습 기록</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <link rel="apple-touch-icon" href="images/logo.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Nanum+Pen+Script&display=swap">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/stats.css">
+</head>
+<body data-page="stats">
+  <div id="cn-nav"></div>
+
+  <main class="container py-4 py-lg-5">
+    <header class="page-head">
+      <div>
+        <h1>학습 기록</h1>
+        <p id="statsSummary"></p>
+      </div>
+    </header>
+
+    <!-- 필터: 아래 모든 기록에 함께 적용 -->
+    <div class="filter-row" role="group" aria-label="기록 범위">
+      <label class="filter-item">
+        <span>연도</span>
+        <select class="form-select form-select-sm" id="yearFilter"></select>
+      </label>
+      <label class="filter-item">
+        <span>과목</span>
+        <select class="form-select form-select-sm" id="subjectFilter"></select>
+      </label>
+    </div>
+
+    <!-- 공부한 날: 1월~12월 한 해 전체 -->
+    <section class="stats-section" aria-labelledby="hmTitle">
+      <div class="section-head">
+        <h2 class="section-title mb-0" id="hmTitle">공부한 날</h2>
+        <div class="hm-legend" aria-hidden="true">
+          <span class="hm-cell l0"></span><span class="legend-text">기록 없음</span>
+          <span class="legend-gap"></span>
+          <span class="legend-text">적음</span>
+          <span class="hm-cell l1"></span><span class="hm-cell l2"></span><span class="hm-cell l3"></span><span class="hm-cell l4"></span>
+          <span class="legend-text">많음</span>
+        </div>
+      </div>
+      <p class="section-note">퀴즈를 풀거나, 자료를 올리거나, 오답을 해결한 날이 칠해져요.</p>
+      <div class="heatmap-wrap" id="heatmapWrap"><div class="heatmap" id="heatmap"></div></div>
+      <details class="table-view">
+        <summary>날짜별 기록 표로 보기</summary>
+        <div class="table-responsive">
+          <table class="table table-sm stats-table">
+            <thead><tr><th>날짜</th><th class="num">퀴즈</th><th class="num">올린 자료</th><th class="num">해결한 오답</th></tr></thead>
+            <tbody id="dayTable"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <div class="row g-5">
+      <!-- 과목별 점수 흐름 -->
+      <section class="col-lg-6 stats-section" aria-labelledby="subTitle">
+        <h2 class="section-title" id="subTitle">과목별 퀴즈 점수</h2>
+        <p class="section-note">이 해에 푼 퀴즈 기준이에요.</p>
+        <div class="sm-table" id="subjectRows"></div>
+      </section>
+
+      <!-- 유형별 정답률 -->
+      <section class="col-lg-6 stats-section" aria-labelledby="typeTitle">
+        <h2 class="section-title" id="typeTitle">유형별 정답률</h2>
+        <p class="section-note">이 해에 푼 모든 문제 기준이에요.</p>
+        <div id="typeBars"></div>
+      </section>
+    </div>
+
+    <div class="chart-tip" id="chartTip" role="tooltip" hidden></div>
+  </main>
+
+  <footer id="cn-footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/stats.js"></script>
+</body>
+</html>
