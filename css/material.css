@@ -1,5 +1,5 @@
 /* =========================================================
- * material.css — 자료 올리기 & 요약 노트 미리보기
+ * material.css — 자료 올리기 & 요약 노트
  * ========================================================= */
 
 /* ---------- 업로드 ---------- */
@@ -24,7 +24,7 @@
 .parsed-box.ok > div > i { color: var(--ink); }
 .parsed-box.error { color: var(--omr); }
 .parsed-box summary { cursor: pointer; color: var(--pencil); margin-top: .4rem; }
-.raw-preview {
+.raw-preview, .raw-text {
   white-space: pre-wrap;
   word-break: break-word;
   font-family: var(--sans);
@@ -37,6 +37,7 @@
   max-height: 260px;
   overflow: auto;
 }
+.raw-text { max-height: none; font-size: .9rem; line-height: 1.75; background: none; padding: 0; max-width: 760px; }
 .scan-note {
   display: flex;
   gap: .5rem;
@@ -47,6 +48,8 @@
   padding: .3rem 0 .3rem .7rem;
 }
 .paste-area { font-size: .92rem; resize: vertical; }
+.audio-guide { font-size: .8rem; color: var(--pencil); margin: -.3rem 0 .8rem; }
+.transcript-stream { white-space: pre-wrap; font-family: var(--serif); font-size: .98rem; line-height: 1.85; margin: 0; }
 
 /* ---------- 요약 미리보기 (종이 한 장) ---------- */
 .stream-card {
@@ -77,43 +80,41 @@
 }
 @keyframes blink { to { opacity: 0; } }
 
-/* ---------- 요약 노트 본문 ---------- */
-.md-body {
-  font-family: var(--serif);
-  font-size: 1.04rem;
-  line-height: 1.9;
-  color: var(--ink);
-  word-break: keep-all;
-  max-width: 720px;
-}
-.md-body h2 {
-  font-size: 1.3rem;
+/* ---------- 보기 모드 ---------- */
+#materialTitle { word-break: keep-all; font-size: 2.1rem; }
+.file-badge-sm {
+  font-size: .7rem;
   font-weight: 700;
-  margin: 2.4rem 0 .8rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--ink);
-}
-.md-body h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
-.md-body h3 { font-size: 1.08rem; font-weight: 700; margin: 1.6rem 0 .5rem; }
-.md-body ul, .md-body ol { padding-left: 1.3rem; }
-.md-body li { margin-bottom: .35rem; }
-.md-body strong { font-weight: 700; background: linear-gradient(transparent 58%, var(--marker) 58%); }
-.md-body code {
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  background: var(--desk);
-  color: var(--ink);
-  padding: .1em .35em;
+  padding: .05rem .4rem;
+  border: 1px solid var(--rule-strong);
   border-radius: 3px;
-  font-size: .86em;
+  color: var(--ink-soft);
 }
-.md-body pre { background: var(--desk); padding: 1rem; border-radius: var(--radius); }
-.md-body pre code { background: none; padding: 0; }
-.md-body table { width: 100%; border-collapse: collapse; margin: .8rem 0 1.4rem; font-size: .95rem; font-family: var(--sans); line-height: 1.6; }
-.md-body th, .md-body td { border-bottom: 1px solid var(--rule); padding: .55rem .7rem .55rem 0; text-align: left; vertical-align: top; }
-.md-body th { border-bottom: 1.5px solid var(--ink); font-weight: 700; }
-.md-body blockquote { border-left: 3px solid var(--rule-strong); padding-left: 1rem; color: var(--ink-soft); }
-.stream-raw { white-space: pre-wrap; font-family: inherit; font-size: inherit; margin: 0; }
+.note-sheet { padding-right: 1rem; }
+.note-sheet .nav-tabs { margin-bottom: 2rem !important; }
 
+.side-block { padding: 0 0 1.6rem 1.4rem; border-left: 1px solid var(--rule); }
+.side-title { font-size: 1rem; font-weight: 700; margin: 0 0 .6rem; }
+.side-list { list-style: none; padding: 0; margin: 0; }
+.side-list a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .45rem 0;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+  color: var(--ink);
+  font-size: .86rem;
+}
+.side-list span { color: var(--pencil); }
+.score-pen { font-family: var(--sans); font-size: .95rem; font-weight: 600; line-height: 1; color: var(--omr); }
+.score-pen small { font-size: inherit; }
+
+@media (max-width: 991.98px) {
+  .side-block { border-left: none; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 1.2rem; }
+  .note-sheet { padding-right: 0; }
+}
 @media (max-width: 575.98px) {
   .stream-card { padding: 1.1rem; min-height: 300px; }
+  #materialTitle { font-size: 1.6rem; }
 }
