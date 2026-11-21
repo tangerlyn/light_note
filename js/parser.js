@@ -153,3 +153,74 @@ async function extractDocx(file) {
     .filter(Boolean);
   return { text: lines.join('\n'), pages: 0, fileType: 'docx', scanned: false };
 }
+
+/* ---------- 녹음 파일 ----------
+ * 무료 키로 쓸 수 있는 '요청에 바로 담아 보내기' 방식은 요청 하나가 20MB까지다.
+ * 파일은 보낼 때 base64로 바뀌며 약 4/3배 커지므로, 원본은 14MB까지만 받는다.
+ */
+const MAX_AUDIO_MB = 14;
+const AUDIO_TYPES = {
+  mp3: 'audio/mp3',
+  wav: 'audio/wav',
+  m4a: 'audio/mp4',
+  aac: 'audio/aac',
+  ogg: 'audio/ogg',
+  oga: 'audio/ogg',
+  opus: 'audio/ogg',
+  flac: 'audio/flac',
+  webm: 'audio/webm',
+  aiff: 'audio/aiff',
+  aif: 'audio/aiff'
+};
+
+function formatMB(bytes) {
+  return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
+}
+
+function formatDuration(sec) {
+  if (!sec) return '';
+  const m = Math.floor(sec / 60);
+  const s = Math.round(sec % 60);
+  if (m >= 60) return `${Math.floor(m / 60)}시간 ${m % 60}분`;
+  return m ? `${m}분 ${s}초` : `${s}초`;
+}
+
+/* 녹음 길이 알아내기 (브라우저가 못 읽는 형식이면 0) */
+function audioDuration(file) {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file);
+    const audio = new Audio();
+    const done = sec => {
+      URL.revokeObjectURL(url);
+      resolve(Number.isFinite(sec) ? sec : 0);
+    };
+    audio.preload = 'metadata';
+    audio.onloadedmetadata = () => done(audio.duration);
+    audio.onerror = () => done(0);
+    setTimeout(() => done(0), 5000);
+    audio.src = url;
+  });
+}
+
+/* 녹음 파일 검사 → { file, fileName, mimeType, size, duration } */
+async function inspectAudio(file) {
+  const ext = fileExt(file.name);
+  const mimeType = AUDIO_TYPES[ext];
+  if (!mimeType) {
+    throw new Error(`지원하지 않는 녹음 형식이에요 (.${ext}). mp3, m4a, wav, ogg, flac 파일을 올려 주세요.`);
+  }
+  if (file.size > MAX_AUDIO_MB * 1024 * 1024) {
+    throw new Error(`파일이 ${formatMB(file.size)}라서 올릴 수 없어요. 녹음은 ${MAX_AUDIO_MB}MB까지만 받아쓸 수 있어요. 녹음을 나누거나 음질을 낮춰서 다시 저장해 주세요.`);
+  }
+  const duration = await audioDuration(file);
+  return { file, fileName: file.name, mimeType, size: file.size, duration };
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = () => reject(new Error('녹음 파일을 읽지 못했어요.'));
+    reader.readAsDataURL(file);
+  });
+}
