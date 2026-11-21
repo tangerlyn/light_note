@@ -1,0 +1,85 @@
+/* =========================================================
+ * review.css — 오답노트 (공책: 왼쪽 빨간 여백선, 줄 쳐진 메모 칸)
+ * ========================================================= */
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: flex-end;
+  padding-bottom: 1.2rem;
+  border-bottom: 1.5px solid var(--ink);
+}
+.filter-group .form-select { min-width: 150px; }
+.filter-group .btn { font-size: .88rem; }
+.filter-group .btn span { opacity: .7; font-size: .8rem; margin-left: .15rem; }
+
+/* 공책 한 장: 왼쪽 여백선 */
+.wrong-card {
+  position: relative;
+  padding: 1.6rem 0 1.6rem 3rem;
+}
+.wrong-card::before {
+  content: '';
+  position: absolute;
+  left: 1.6rem;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--omr-line);
+}
+.wrong-card .q-text,
+.wrong-card .choices,
+.wrong-card .answer-compare,
+.wrong-card .feedback,
+.wrong-card .explanation { margin-left: 0; }
+.wrong-card.resolved { opacity: .7; }
+.wrong-card.resolved::before { background: var(--rule-strong); }
+
+.wrong-meta {
+  display: flex;
+  align-items: center;
+  gap: .4rem 1rem;
+  font-size: .82rem;
+  color: var(--pencil);
+  margin-bottom: .7rem;
+  min-width: 0;
+}
+.wrong-meta a { color: var(--pencil); }
+.subject-tag {
+  font-weight: 700;
+  color: var(--ink);
+  padding-left: .55rem;
+  border-left: 4px solid var(--c);
+  white-space: nowrap;
+}
+.wrong-count { font-weight: 600; }
+.wrong-count.many { color: var(--omr); }
+
+/* 줄 쳐진 메모 칸 */
+.memo-wrap { margin-top: 1rem; }
+.memo {
+  font-family: var(--serif);
+  font-size: .95rem;
+  line-height: 30px;
+  padding: 0 .2rem;
+  border: none;
+  border-radius: 0;
+  resize: vertical;
+  background: transparent;
+  background-image: repeating-linear-gradient(transparent, transparent 29px, var(--rule) 29px, var(--rule) 30px);
+  min-height: 62px;
+}
+.memo:focus { box-shadow: none; background-color: #fffdf0; }
+.memo::placeholder { color: #a9adb6; }
+
+.wrong-actions { display: flex; align-items: center; justify-content: flex-end; gap: .3rem; margin-top: .6rem; }
+.resolved-label { font-size: .85rem; color: var(--pencil); font-weight: 600; margin-right: auto; }
+
+@media (max-width: 575.98px) {
+  .filter-group { flex: 1 1 45%; }
+  .filter-group .form-select { min-width: 0; width: 100%; }
+  .wrong-meta { flex-wrap: wrap; }
+  .wrong-card { padding-left: 1.6rem; }
+  .wrong-card::before { left: .6rem; }
+}

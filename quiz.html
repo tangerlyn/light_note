@@ -89,10 +89,26 @@
               <div class="progress" style="height:3px"><div class="progress-bar" id="solveProgress"></div></div>
               <span id="solveCount"></span>
             </div>
-            <button type="button" class="btn btn-primary btn-lg w-100" id="submitBtn">답안 제출</button>
+            <button type="button" class="btn btn-primary btn-lg w-100" id="submitBtn">답안 제출하고 채점</button>
+            <button type="button" class="d-none" id="submitTopBtn" tabindex="-1" aria-hidden="true"></button>
           </div>
         </aside>
       </div>
+    </section>
+
+    <!-- 4. 결과: 빨간 펜 채점 -->
+    <section id="resultView" class="d-none">
+      <div class="result-hero" id="resultHero"></div>
+      <div class="result-tools">
+        <h2 class="section-title mb-0">문항별 채점</h2>
+        <div class="btn-group" role="group" aria-label="결과 필터">
+          <input type="radio" class="btn-check" name="resultFilter" id="rfAll" value="all" checked>
+          <label class="btn btn-sm btn-outline-secondary" for="rfAll">전체</label>
+          <input type="radio" class="btn-check" name="resultFilter" id="rfWrong" value="wrong">
+          <label class="btn btn-sm btn-outline-secondary" for="rfWrong">틀린 문제만</label>
+        </div>
+      </div>
+      <div id="resultList" class="exam-paper"></div>
     </section>
   </main>
 

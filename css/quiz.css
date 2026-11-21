@@ -1,76 +1,8 @@
 /* =========================================================
- * quiz.css — 퀴즈 만들기 · 풀기 (시험지 + OMR 답안지)
+ * quiz.css — 퀴즈: 시험지 + OMR 답안지 + 빨간 펜 채점
  * ========================================================= */
 
 .min-w-0 { min-width: 0; }
-
-/* ---------- 문항 (시험지) ---------- */
-.q-card {
-  padding: 1.6rem 0 1.7rem;
-  border-bottom: 1px solid var(--rule);
-}
-.q-card:last-child { border-bottom: none; }
-.q-head { display: flex; align-items: baseline; gap: .6rem; margin-bottom: .5rem; }
-.q-num {
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: 1.25rem;
-  min-width: 1.8rem;
-  position: relative;
-}
-.q-num::after { content: '.'; }
-.q-topic { font-size: .8rem; color: var(--pencil); }
-.q-text {
-  font-family: var(--serif);
-  font-size: 1.1rem;
-  line-height: 1.75;
-  margin: 0 0 1rem 2.4rem;
-  white-space: pre-wrap;
-  word-break: keep-all;
-}
-
-/* 보기: ①②③④ 동그라미 번호. 고르면 OMR처럼 까맣게 칠해진다 */
-.choices { display: flex; flex-direction: column; gap: .15rem; margin-left: 2.4rem; }
-.choice {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  padding: .45rem .5rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-family: var(--serif);
-  font-size: 1.02rem;
-}
-.choice input { position: absolute; opacity: 0; pointer-events: none; }
-.choice-key {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1.5px solid var(--ink);
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: .78rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background .12s, color .12s;
-}
-.choice-text { flex: 0 1 auto; }
-label.choice:hover { background: var(--desk); }
-label.choice:has(input:checked) .choice-key { background: var(--ink); color: #fff; }
-label.choice:has(input:focus-visible) { outline: 2px solid var(--omr); outline-offset: 1px; }
-
-.type-badge {
-  display: inline-block;
-  font-size: .74rem;
-  font-weight: 600;
-  padding: .05rem .45rem;
-  border: 1px solid var(--rule-strong);
-  border-radius: 3px;
-  color: var(--ink-soft);
-  background: var(--paper);
-}
 
 /* ---------- 1. 설정 ---------- */
 .setup-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .8rem; }
@@ -217,14 +149,77 @@ label.choice:has(input:focus-visible) { outline: 2px solid var(--omr); outline-o
 .omr-progress { display: flex; align-items: center; gap: .7rem; margin: .8rem 0; font-size: .82rem; color: var(--pencil); }
 .omr-progress .progress { flex: 1; }
 
+/* ---------- 4. 빨간 펜 채점 ---------- */
+.result-hero {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 1rem 0 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 3px double var(--ink);
+}
+.pen-score {
+  position: relative;
+  flex-shrink: 0;
+  width: 220px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--omr);
+  font-family: var(--pen);
+  transform: rotate(-4deg);
+}
+.pen-score-num { font-size: 5.2rem; line-height: 1; }
+.pen-score-unit { font-size: 2.4rem; margin-left: .2rem; align-self: flex-end; padding-bottom: 1.4rem; }
+.pen-loop { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.pen-loop path, .pen-mark path {
+  fill: none;
+  stroke: var(--omr);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.result-kicker { display: flex; flex-wrap: wrap; gap: .2rem 1rem; font-size: .85rem; color: var(--pencil); margin-bottom: .4rem; }
+.result-info h1 { font-size: 1.7rem; font-weight: 700; margin-bottom: .5rem; }
+.result-message { color: var(--ink-soft); margin-bottom: .9rem; }
+.type-scores { display: flex; flex-wrap: wrap; gap: 1.4rem; font-size: .9rem; color: var(--pencil); }
+.type-score b { font-family: var(--serif); font-size: 1.15rem; color: var(--ink); margin-left: .25rem; }
+.result-tools { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; margin: 1.5rem 0 .3rem; }
+
+.q-card.result .q-num { display: inline-block; }
+.pen-mark {
+  position: absolute;
+  left: -16px;
+  top: -13px;
+  width: 52px;
+  height: 47px;
+  overflow: visible;
+  pointer-events: none;
+}
+/* 채점 순간: 빨간 펜이 위에서부터 차례로 지나가는 한 번의 움직임 */
+.pen-loop path, .pen-mark path {
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+  animation: pen-draw .5s ease-out forwards;
+  animation-delay: var(--d, 0ms);
+}
+.pen-loop path { stroke-dasharray: 560; stroke-dashoffset: 560; animation-duration: .8s; animation-delay: .1s; }
+@keyframes pen-draw { to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pen-loop path, .pen-mark path { stroke-dashoffset: 0; }
+}
 @media (max-width: 991.98px) {
   .omr-wrap { position: static; }
   .omr { max-height: none; }
 }
 @media (max-width: 767.98px) {
+  .result-hero { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .pen-score { width: 170px; height: 96px; }
+  .pen-score-num { font-size: 4rem; }
   .exam-title { font-size: 1.35rem; }
 }
 @media (max-width: 575.98px) {
-  .q-text, .choices { margin-left: 0; }
   .short-input { margin-left: 0; width: 100%; }
 }
